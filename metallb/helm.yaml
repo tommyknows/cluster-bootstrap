@@ -1,0 +1,12 @@
+---
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata: 
+  name: metallb
+  namespace: metallb
+spec:
+  releaseName: metallb
+  chart: 
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: metallb
+    version: 0.9.5
