@@ -37,10 +37,6 @@ spec:
     
     persistence:
       enabled: true
-      giteaSize: 10Gi
-      postgresSize: 5Gi
-      storageClass: nfs
-      accessMode: ReadWriteMany
-      annotations:
-        "helm.sh/resource-policy": keep
+      existingGiteaClaim: gitea-gitea
+      existingPostgresClaim: gitea-postgres
 
