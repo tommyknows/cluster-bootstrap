@@ -7,9 +7,9 @@ metadata:
 spec:
   releaseName: gitea
   chart: 
-    repository: https://kubernetes-charts.storage.googleapis.com/
-    name: jfelten/gitea
-    version: 1.6.1
+    git: https://github.com/jfelten/gitea-helm-chart.git
+    ref: master
+    path: ""
   values:
     ingress:
       enabled: true
