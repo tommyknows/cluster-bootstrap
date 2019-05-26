@@ -7,7 +7,9 @@ metadata:
 spec:
   releaseName: nfs-provisioner
   chart:
-    name: stable/nfs-server-provisioner
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: nfs-server-provisioner
+    version: 0.3.0
   values: 
     persistence:
       accessMode: ReadWriteMany
