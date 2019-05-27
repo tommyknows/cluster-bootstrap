@@ -1,0 +1,31 @@
+---
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata: 
+  name: drone
+  namespace: drone
+spec:
+  releaseName: drone
+  chart: 
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    name: drone
+    version: 2.0.0-rc.13
+  values:
+    sourceControl:
+      provider: gitea
+      gitea:
+       server: gitea.gitea
+    server:
+      env:
+        DRONE_LOGS_DEBUG: "false"
+        DRONE_DATABASE_DRIVER: "sqlite3"
+        DRONE_DATABASE_DATASOURCE: "/var/lib/drone/drone.sqlite"
+        DRONE_GITEA_SERVER: "gitea.gitea"
+        DRONE_GIT_ALWAYS_AUTH: true
+        DRONE_USER_CREATE: "username:ramon,machine:false,admin:true,token:c1e403f0e6df668becdb9baad9bd2736"
+        DRONE_GIT_USERNAME: "ramon"
+        DRONE_GIT_PASSWORD: "4fdda3f060003b1f16630bb79a26162ec3b4d432"
+    persistence:
+      enabled: true
+      existingClaim: drone
+    
