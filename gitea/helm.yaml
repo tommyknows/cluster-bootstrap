@@ -7,7 +7,7 @@ metadata:
 spec:
   releaseName: gitea
   chart: 
-    git: https://github.com/jfelten/gitea-helm-chart.git
+    git: https://github.com/tommyknows/gitea-helm-chart.git
     ref: master
     path: "."
   values:
