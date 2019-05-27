@@ -28,6 +28,7 @@ spec:
         - name: SCRIPT
           value: &script |-
             cd /tmp/migration/
+            ls
             cp app.ini /etc/gitea/app.ini
             cp -r gitea-repo/* /datatmp/git/gitea-repositories/
             # copy the sql file to the init entrypoint for postgres to load
