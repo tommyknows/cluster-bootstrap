@@ -28,11 +28,12 @@ spec:
         - name: SCRIPT
           value: &script |-
             cd /tmp/migration/
-            ls
-            cp app.ini /etc/gitea/app.ini
-            cp -r gitea-repo/* /datatmp/git/gitea-repositories/
-            # copy the sql file to the init entrypoint for postgres to load
-            cp gitea-db.sql /docker-entrypoint-initdb.d/
+            sleep 3600
+            #ls
+            #cp app.ini /etc/gitea/app.ini
+            #cp -r gitea-repo/* /datatmp/git/gitea-repositories/
+            ## copy the sql file to the init entrypoint for postgres to load
+            #cp gitea-db.sql /docker-entrypoint-initdb.d/
         command: ["/bin/sh",'-c', *script]
         volumeMounts:
         - name: gitea-data
