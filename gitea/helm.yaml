@@ -30,6 +30,7 @@ spec:
             cd /tmp/migration/
             ls
             cp app.ini /etc/gitea/app.ini
+            touch /etc/gitea/test
             cp -r gitea-repo/* /datatmp/git/gitea-repositories/
             # copy the sql file to the init entrypoint for postgres to load
             cp gitea-db.sql /docker-entrypoint-initdb.d/
