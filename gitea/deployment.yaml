@@ -50,10 +50,10 @@ spec:
         volumeMounts:
         - name: gitea-data
           mountPath: /home/git/gitea-repositories
-        - name: gitea-config
-          mountPath: /data/gitea/conf
         - name: gitea-db
           mountPath: /var/lib/gitea/data
+        - name: gitea-configdir
+          mountPath: /data/gitea/conf
       initContainers:
           # TODO: init container for migration
       - name: migrate
@@ -65,6 +65,8 @@ spec:
           mountPath: /data
         - name: gitea-migration
           mountPath: /tmp/migration
+        - name: gitea-configdir
+          mountPath: /conf
         env:
         - name: SCRIPT
           value: &script |-
@@ -72,6 +74,7 @@ spec:
             ls 
             mkdir -p /data/git
             cp -r gitea-repositories /data/
+            cp app.ini /conf/
             touch /db/git.db
             sqlite3 /db/git.db <gitea-db.sql
         command: ["/bin/sh", "-c", *script]
@@ -87,6 +90,8 @@ spec:
       - name: gitea-config
         configMap:
           name: gitea-app-ini
+      - name: gitea-configdir
+        emptyDir: {}
       - hostPath:
           path: /mnt/data/cluster/gitea-migration
           type: Directory
