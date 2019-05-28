@@ -12,9 +12,9 @@ spec:
     version: 2.0.0-rc.13
   values:
     sourceControl:
-      provider: gitea
+      provider: "gitea"
       gitea:
-       server: gitea-http.gitea
+       server: "gitea-http.gitea"
     server:
       alwaysAuth: true
       host: drone.ramonruettimann.ml
