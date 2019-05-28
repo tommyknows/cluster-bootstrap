@@ -60,7 +60,9 @@ spec:
         image: gitea/gitea:1.8.1
         volumeMounts:
         - name: gitea-db
-          mountPath: /var/lib/gitea/data
+          mountPath: /db
+        - name: gitea-data
+          mountPath: /data
         - name: gitea-migration
           mountPath: /tmp/migration
         env:
@@ -68,16 +70,11 @@ spec:
           value: &script |-
             cd /tmp/migration/
             ls 
+            mkdir -p /data/git
             cp -r gitea-repositories /data/git/gitea-repositories
-            sqlite3 /var/lib/gitea/data/git.db <gitea-db.sql
+            touch /db/git.db
+            sqlite3 /db/git.db <gitea-db.sql
         command: ["/bin/sh", "-c", *script]
-        volumeMounts:
-        - mountPath: /data
-          name: gitea-data
-        - mountPath: /etc/gitea
-          name: gitea-config
-        - mountPath: /tmp/migration
-          name: gitea-migration
       volumes:
       - name: gitea-data
         hostPath:
