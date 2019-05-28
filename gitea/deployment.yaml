@@ -70,7 +70,7 @@ spec:
         env:
         - name: SCRIPT
           value: &script |-
-            if [ ! -e /db/git.db ]; then exit 0; fi
+            if [ -e /db/git.db ]; then exit 0; fi
             cd /tmp/migration/
             ls 
             mkdir -p /data/git
