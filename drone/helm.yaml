@@ -14,7 +14,7 @@ spec:
     sourceControl:
       provider: "gitea"
       gitea:
-        server: "gitea-http.gitea"
+        server: "http://gitea-http.gitea"
     server:
       alwaysAuth: true
       host: drone.ramonruettimann.ml
