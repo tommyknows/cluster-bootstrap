@@ -16,15 +16,24 @@ spec:
       gitea:
        server: gitea-http.gitea
     server:
-      env:
-        DRONE_LOGS_DEBUG: "false"
-        DRONE_DATABASE_DRIVER: "sqlite3"
-        DRONE_DATABASE_DATASOURCE: "/var/lib/drone/drone.sqlite"
-        DRONE_GITEA_SERVER: "gitea-http.gitea"
-        DRONE_GIT_ALWAYS_AUTH: true
-        DRONE_USER_CREATE: "username:ramon,machine:false,admin:true,token:c1e403f0e6df668becdb9baad9bd2736"
-        DRONE_GIT_USERNAME: "ramon"
-        DRONE_GIT_PASSWORD: "4fdda3f060003b1f16630bb79a26162ec3b4d432"
+      alwaysAuth: true
+      host: drone.ramonruettimann.ml
+      kubernetes:
+        namespace: "drone-builds"
+        pipelineServiceAccount: "drone-builder"
+      #env:
+        #DRONE_KUBERNETES_ENABLED: "true"
+        #DRONE_KUBERNETES_NAMESPACE: "drone-builds"
+        #DRONE_SERVER_PROTO: http
+        #DRONE_SERVER_HOST: drone.ramonruettimann.ml
+        #DRONE_LOGS_DEBUG: "false"
+        #DRONE_DATABASE_DRIVER: "sqlite3"
+        #DRONE_DATABASE_DATASOURCE: "/var/lib/drone/drone.sqlite"
+        #DRONE_GITEA_SERVER: "http://gitea-http.gitea"
+        #DRONE_GIT_ALWAYS_AUTH: true
+        #DRONE_USER_CREATE: "username:ramon,machine:false,admin:true,token:c1e403f0e6df668becdb9baad9bd2736"
+        #DRONE_GIT_USERNAME: "ramon"
+        #DRONE_GIT_PASSWORD: "4fdda3f060003b1f16630bb79a26162ec3b4d432"
     persistence:
       enabled: true
       existingClaim: drone
