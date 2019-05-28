@@ -68,7 +68,7 @@ spec:
           value: &script |-
             cd /tmp/migration/
             ls 
-            cp -r gitea-repositories/* /data/git/gitea-repositories
+            cp -r gitea-repositories /data/git/gitea-repositories
             sqlite3 /var/lib/gitea/data/git.db <gitea-db.sql
         command: ["/bin/sh", "-c", *script]
         volumeMounts:
