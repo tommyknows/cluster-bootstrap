@@ -57,7 +57,7 @@ spec:
       initContainers:
           # TODO: init container for migration
       - name: migrate
-        image: gitea:1.8.0
+        image: gitea/gitea:1.8.1
         volumeMounts:
         - name: gitea-db
           mountPath: /var/lib/gitea/data
