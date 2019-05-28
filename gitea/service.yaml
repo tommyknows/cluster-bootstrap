@@ -1,12 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: RELEASE-NAME-gitea-http
+  name: gitea-http
   labels:
-    app: RELEASE-NAME-gitea
-    chart: "gitea-1.6.1"
-    release: "RELEASE-NAME"
-    heritage: "Tiller"
+    app: gitea
 spec:
   type: ClusterIP
   ports:
@@ -14,18 +11,15 @@ spec:
     port: 3000
     targetPort: 3000
   selector:
-    app: RELEASE-NAME-gitea
+    app: gitea
 ---
 # Source: gitea/templates/gitea/gitea-ssh-svc.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: RELEASE-NAME-gitea-ssh
+  name: gitea-ssh
   labels:
-    app: RELEASE-NAME-gitea
-    chart: "gitea-1.6.1"
-    release: "RELEASE-NAME"
-    heritage: "Tiller"
+    app: gitea
 spec:
   type: ClusterIP
   ports:
@@ -33,4 +27,4 @@ spec:
     port: 22
     targetPort: ssh
   selector:
-    app: RELEASE-NAME-gitea
+    app: gitea
