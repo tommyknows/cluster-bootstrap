@@ -51,7 +51,7 @@ spec:
         - name: gitea-data
           mountPath: /home/git/gitea-repositories
         - name: gitea-config
-          mountPath: /etc/gitea
+          mountPath: /data/gitea/conf
         - name: gitea-db
           mountPath: /var/lib/gitea/data
       initContainers:
