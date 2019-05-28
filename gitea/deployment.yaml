@@ -71,7 +71,7 @@ spec:
             cd /tmp/migration/
             ls 
             mkdir -p /data/git
-            cp -r gitea-repositories /data/git/gitea-repositories
+            cp -r gitea-repositories /data/
             touch /db/git.db
             sqlite3 /db/git.db <gitea-db.sql
         command: ["/bin/sh", "-c", *script]
