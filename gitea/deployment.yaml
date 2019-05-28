@@ -68,13 +68,13 @@ spec:
           mountPath: /var/lib/gitea/data
         - name: gitea-migration
           mountPath: /tmp/migration
-        command: ["/bin/sh", "-c", *script]
         env:
         - name: SCRIPT
           value: &script |-
             cd /tmp/migration/
             cp -r gitea-repo/* /data/git/gitea-repositories
             sqlite3 /var/lib/gitea/data/git.db <gitea-db.sql
+        command: ["/bin/sh", "-c", *script]
         volumeMounts:
         - mountPath: /data
           name: gitea-data
