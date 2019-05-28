@@ -1,0 +1,102 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gitea
+  labels:
+    app: gitea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      labels:
+        app: gitea
+    spec:
+      containers:
+      - name: gitea
+        # TODO: check newest image tag
+        image: gitea/gitea:1.8.1
+        imagePullPolicy: 
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db
+              key: dbPassword
+        ports:
+        - name: ssh
+          containerPort: 22
+        - name: http
+          containerPort: 3000
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 200
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 10
+        readinessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 1000m
+            memory: 500Mi
+        volumeMounts:
+        - name: gitea-data
+          mountPath: /home/git/gitea-repositories
+        - name: gitea-config
+          mountPath: /etc/gitea
+        - name: gitea-db
+          mountPath: /var/lib/gitea/data
+      initContainers:
+          # TODO: init container for migration
+      - name: migrate
+        image: gitea:1.8.0
+        volumeMounts:
+        - name: gitea-db
+          mountPath: /var/lib/gitea/data
+        - name: gitea-migration
+          mountPath: /tmp/migration
+        command: ["/bin/sh", "-c", *script]
+        env:
+        - name: SCRIPT
+          value: &script |-
+            cd /tmp/migration/
+            cp -r gitea-repo/* /data/git/gitea-repositories
+            sqlite3 /var/lib/gitea/data/git.db <gitea-db.sql
+        volumeMounts:
+        - mountPath: /data
+          name: gitea-data
+        - mountPath: /etc/gitea
+          name: gitea-config
+        - mountPath: /tmp/migration
+          name: gitea-migration
+        - mountPath: /docker-entrypoint-initdb.d
+          name: postgres-migration
+      volumes:
+      - name: gitea-data
+        hostPath:
+          path: /mnt/data/cluster/gitea
+          type: Directory
+      - name: gitea-db
+        hostPath:
+          path: /mnt/data/cluster/gitea/db
+          type: Directory
+      - name: gitea-config
+        configMap:
+          name: gitea-app-ini
+      - hostPath:
+          path: /mnt/data/cluster/gitea-migration
+          type: Directory
+        name: gitea-migration

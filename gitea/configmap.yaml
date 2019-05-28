@@ -1,0 +1,8 @@
+## Upload this configmap from app.ini file
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+  #name: gitea-app-ini
+#data:
+  #app.ini: |-
+    ## load from app.ini migration file
