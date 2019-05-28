@@ -67,7 +67,8 @@ spec:
         - name: SCRIPT
           value: &script |-
             cd /tmp/migration/
-            cp -r gitea-repo/* /data/git/gitea-repositories
+            ls 
+            cp -r gitea-repositories/* /data/git/gitea-repositories
             sqlite3 /var/lib/gitea/data/git.db <gitea-db.sql
         command: ["/bin/sh", "-c", *script]
         volumeMounts:
@@ -80,7 +81,7 @@ spec:
       volumes:
       - name: gitea-data
         hostPath:
-          path: /mnt/data/cluster/gitea
+          path: /mnt/data/cluster/gitea/data
           type: Directory
       - name: gitea-db
         hostPath:
