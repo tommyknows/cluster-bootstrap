@@ -22,17 +22,10 @@ spec:
       kubernetes:
         namespace: "drone-builds"
         pipelineServiceAccount: "drone-builder"
-      env:
-        DRONE_GIT_USERNAME: 
-          valueFrom:
-            secretKeyRef:
-              name: drone-apitoken
-              key: username
-        DRONE_GIT_PASSWORD: 
-          valueFrom:
-            secretKeyRef:
-              name: drone-apitoken
-              key: token
+      envSecrets:
+        drone-apitoken:
+          - DRONE_GIT_USERNAME
+          - DRONE_GIT_APITOKEN
     persistence:
       enabled: true
       existingClaim: drone
