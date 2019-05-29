@@ -17,6 +17,7 @@ spec:
         server: "http://gitea-http.gitea"
     server:
       alwaysAuth: true
+      adminUser: ramon
       host: drone.ramonruettimann.ml
       kubernetes:
         namespace: "drone-builds"
