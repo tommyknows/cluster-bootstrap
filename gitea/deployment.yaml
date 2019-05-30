@@ -49,7 +49,7 @@ spec:
             memory: 500Mi
         volumeMounts:
         - name: gitea-data
-          mountPath: /data/git/gitea-repositories
+          mountPath: /data/git
         - name: gitea-db
           mountPath: /var/lib/gitea/data
         - name: gitea-configdir
