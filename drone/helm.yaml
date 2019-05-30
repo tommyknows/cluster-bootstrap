@@ -14,7 +14,7 @@ spec:
     sourceControl:
       provider: "gitea"
       gitea:
-        server: "http://gitea-http.gitea"
+        server: "http://gitea.gitea"
     server:
       alwaysAuth: true
       adminUser: ramon
