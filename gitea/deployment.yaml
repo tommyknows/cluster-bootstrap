@@ -67,15 +67,18 @@ spec:
           mountPath: /tmp/migration
         - name: gitea-configdir
           mountPath: /conf
+        - name: gitea-config
+          mountPath: /writeconf
         env:
         - name: SCRIPT
           value: &script |-
-            if [ -e /db/git.db ]; then exit 0; fi
             cd /tmp/migration/
-            ls 
-            mkdir -p /data/git
             cp -r gitea-repositories /data/
-            cp app.ini /conf/
+            # gitea wants a writeable config, so 
+            # we cannot use the configmap directly
+            cp /writeconf/app.ini /conf/
+            if [ -e /db/git.db ]; then exit 0; fi
+            mkdir -p /data/git
             touch /db/git.db
             sqlite3 /db/git.db <gitea-db.sql
             chown git /db/git.db
