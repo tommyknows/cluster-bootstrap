@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: git
+  name: git
+  namespace: ramonruettimann
+spec:
+  externalName: gitea.gitea.svc.cluster.local
+  selector:
+    app: git
+  sessionAffinity: None
+  type: ExternalName

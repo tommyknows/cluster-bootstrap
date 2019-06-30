@@ -5,14 +5,12 @@ metadata:
   namespace: drone
 spec:
   capacity:
-    storage: 10Gi 
+    storage: 10Gi
   accessModes:
-    - ReadWriteMany 
-  persistentVolumeReclaimPolicy: Retain 
-  nfs: 
-    path: /mnt/data/cluster/drone
-    server: 192.168.254.1
-    readOnly: false
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/mnt/data/cluster/drone"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

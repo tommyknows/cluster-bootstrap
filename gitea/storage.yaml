@@ -5,14 +5,12 @@ metadata:
   namespace: gitea
 spec:
   capacity:
-    storage: 8Gi 
+    storage: 8Gi
   accessModes:
-    - ReadWriteMany 
-  persistentVolumeReclaimPolicy: Retain 
-  nfs: 
-    path: /mnt/data/cluster/gitea
-    server: 192.168.254.1
-    readOnly: false
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/mnt/data/cluster/gitea"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -21,7 +19,7 @@ metadata:
   namespace: gitea
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 8Gi
