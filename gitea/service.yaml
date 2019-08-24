@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gitea
+  name: gitea-http
   namespace: gitea
   labels:
     app: gitea
@@ -11,6 +11,19 @@ spec:
   - name: http
     port: 80
     targetPort: 3000
+  selector:
+    app: gitea
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea-ssh
+  namespace: gitea
+  labels:
+    app: gitea
+spec:
+  type: LoadBalancer
+  ports:
   - name: ssh
     port: 22
     targetPort: ssh

@@ -19,7 +19,6 @@ spec:
       - name: gitea
         # TODO: check newest image tag
         image: gitea/gitea:1.7.2
-        imagePullPolicy: 
         ports:
         - name: ssh
           containerPort: 22
@@ -74,7 +73,7 @@ spec:
           value: &script |-
             cd /tmp/migration/
             cp -r gitea-repositories /data/
-            # gitea wants a writeable config, so 
+            # gitea wants a writeable config, so
             # we cannot use the configmap directly
             cp /writeconf/app.ini /conf/
             if [ -e /db/git.db ]; then exit 0; fi
