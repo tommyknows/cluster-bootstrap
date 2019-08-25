@@ -6,6 +6,9 @@ metadata:
   labels:
     app: gitea
 spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -16,9 +19,10 @@ spec:
         app: gitea
     spec:
       containers:
+        # TODO: this runs ssh and gitea in one container.
+        # it would make sense to split these up into two containers instead.
       - name: gitea
-        # TODO: check newest image tag
-        image: gitea/gitea:1.7.2
+        image: gitea/gitea:latest
         ports:
         - name: ssh
           containerPort: 22
@@ -54,9 +58,10 @@ spec:
         - name: gitea-configdir
           mountPath: /data/gitea/conf
       initContainers:
-          # TODO: init container for migration
       - name: migrate
-        image: gitea/gitea:1.8.1
+        image: gitea/gitea:latest
+        securityContext:
+          runAsUser: 1000 # run init as git user
         volumeMounts:
         - name: gitea-db
           mountPath: /db
