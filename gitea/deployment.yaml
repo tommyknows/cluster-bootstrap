@@ -83,7 +83,7 @@ spec:
             cp /writeconf/app.ini /conf/
             if [ -e /db/git.db ]; then exit 0; fi
             mkdir -p /data/git
-            chown -R git /data
+            chown -R 1000 /data
             touch /db/git.db
             sqlite3 /db/git.db <gitea-db.sql
             chown git /db/git.db
