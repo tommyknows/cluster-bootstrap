@@ -5,6 +5,7 @@ metadata:
   namespace: gitea
   labels:
     app: gitea
+    webservice: "true"
 spec:
   strategy:
     rollingUpdate:
@@ -13,10 +14,12 @@ spec:
   selector:
     matchLabels:
       app: gitea
+      webservice: "true"
   template:
     metadata:
       labels:
         app: gitea
+        webservice: "true"
     spec:
       containers:
         # TODO: this runs ssh and gitea in one container.
@@ -26,11 +29,11 @@ spec:
         ports:
         - name: ssh
           containerPort: 22
-        - name: http
+        - name: gitea-http
           containerPort: 3000
         livenessProbe:
           tcpSocket:
-            port: http
+            port: gitea-http
           initialDelaySeconds: 200
           timeoutSeconds: 1
           periodSeconds: 10
@@ -38,18 +41,18 @@ spec:
           failureThreshold: 10
         readinessProbe:
           tcpSocket:
-            port: http
+            port: gitea-http
           initialDelaySeconds: 5
           periodSeconds: 10
           successThreshold: 1
           failureThreshold: 3
         resources:
           limits:
-            cpu: 1
-            memory: 2Gi
+            cpu: 500m
+            memory: 750Mi
           requests:
-            cpu: 1000m
-            memory: 500Mi
+            cpu: 100m
+            memory: 300Mi
         volumeMounts:
         - name: gitea-data
           mountPath: /data
@@ -83,11 +86,12 @@ spec:
             cp /writeconf/app.ini /conf/
             if [ -e /db/git.db ]; then exit 0; fi
             mkdir -p /data/git
-            chown -R 1000 /data
             touch /db/git.db
             sqlite3 /db/git.db <gitea-db.sql
             chown git /db/git.db
             chgrp git /db/git.db
+            chown -R git /data
+
         command: ["/bin/sh", "-c", *script]
       volumes:
       - name: gitea-data

@@ -5,14 +5,16 @@ metadata:
   namespace: gitea
   labels:
     app: gitea
+    webservice: "true"
 spec:
   type: NodePort
   ports:
   - name: http
     port: 80
-    targetPort: 3000
+    targetPort: gitea-http
   selector:
     app: gitea
+    webservice: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -21,6 +23,7 @@ metadata:
   namespace: gitea
   labels:
     app: gitea
+    webservice: "true"
 spec:
   type: LoadBalancer
   ports:
@@ -29,3 +32,4 @@ spec:
     targetPort: ssh
   selector:
     app: gitea
+    webservice: "true"
