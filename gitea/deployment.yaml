@@ -79,19 +79,17 @@ spec:
         env:
         - name: SCRIPT
           value: &script |-
-            cd /tmp/migration/
-            cp -r gitea-repositories /data/
             # gitea wants a writeable config, so
             # we cannot use the configmap directly
             cp /writeconf/app.ini /conf/
             if [ -e /db/git.db ]; then exit 0; fi
             mkdir -p /data/git
+            cp -r /tmp/migration/gitea-repositories /data/git
             touch /db/git.db
-            sqlite3 /db/git.db <gitea-db.sql
+            sqlite3 /db/git.db </tmp/migration/gitea-db.sql
             chown git /db/git.db
             chgrp git /db/git.db
             chown -R git /data
-
         command: ["/bin/sh", "-c", *script]
       volumes:
       - name: gitea-data
