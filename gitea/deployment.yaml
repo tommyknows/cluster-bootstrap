@@ -6,34 +6,91 @@ metadata:
   labels:
     app: gitea
     webservice: "true"
+    chart: "gitea-1.9.3"
+    release: "gitea"
+    heritage: "Tiller"
 spec:
-  strategy:
-    rollingUpdate:
-      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
       app: gitea
-      webservice: "true"
   template:
     metadata:
       labels:
-        app: gitea
         webservice: "true"
+        app: gitea
     spec:
       containers:
-        # TODO: this runs ssh and gitea in one container.
-        # it would make sense to split these up into two containers instead.
+      - name: postgres
+        image: "postgres:11"
+        imagePullPolicy: "Always"
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        # Required for pg_isready in the health probes.
+        - name: PGUSER
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "gitea"
+        - name: POSTGRES_INITDB_ARGS
+          value: ""
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db
+              key: dbPassword
+        - name: POD_IP
+          valueFrom: { fieldRef: { fieldPath: status.podIP } }
+        ports:
+        - name: postgresql
+          containerPort: 5432
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - exec pg_isready --host $POD_IP
+          initialDelaySeconds: 120
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - exec pg_isready --host $POD_IP
+          initialDelaySeconds: 5
+          timeoutSeconds: 3
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data/pgdata
+          subPath: postgresql-db
       - name: gitea
-        image: gitea/gitea:latest
+        image: gitea/gitea:1.9.4
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db
+              key: dbPassword
         ports:
         - name: ssh
           containerPort: 22
-        - name: gitea-http
+        - name: http
           containerPort: 3000
         livenessProbe:
           tcpSocket:
-            port: gitea-http
+            port: http
           initialDelaySeconds: 200
           timeoutSeconds: 1
           periodSeconds: 10
@@ -41,71 +98,80 @@ spec:
           failureThreshold: 10
         readinessProbe:
           tcpSocket:
-            port: gitea-http
+            port: http
           initialDelaySeconds: 5
           periodSeconds: 10
           successThreshold: 1
           failureThreshold: 3
         resources:
           limits:
-            cpu: 500m
-            memory: 750Mi
+            cpu: 1
+            memory: 2Gi
           requests:
-            cpu: 100m
-            memory: 300Mi
+            cpu: 1000m
+            memory: 500Mi
         volumeMounts:
         - name: gitea-data
           mountPath: /data
-        - name: gitea-db
-          mountPath: /var/lib/gitea/data
-        - name: gitea-configdir
-          mountPath: /data/gitea/conf
-      initContainers:
-      - name: migrate
-        image: gitea/gitea:latest
+        #- name: gitea-config
+          #mountPath: /etc/gitea
+      - name: memcached
+        image: memcached:1.5.19-alpine
+        command:
+          - memcached
+          - -m 64
+          - -o
+          - modern
+          - -v
+        ports:
+        - name: memcache
+          containerPort: 11211
+        livenessProbe:
+          tcpSocket:
+            port: memcache
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: memcache
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
         securityContext:
-          runAsUser: 1000 # run init as git user
-        volumeMounts:
-        - name: gitea-db
-          mountPath: /db
-        - name: gitea-data
-          mountPath: /data
-        - name: gitea-migration
-          mountPath: /tmp/migration
-        - name: gitea-configdir
-          mountPath: /conf
-        - name: gitea-config
-          mountPath: /writeconf
+          runAsUser: 1000
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+      initContainers:
+      - name: init
+        image: gitea/gitea:1.9.4
         env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db
+              key: dbPassword
         - name: SCRIPT
           value: &script |-
-            # gitea wants a writeable config, so
-            # we cannot use the configmap directly
-            cp /writeconf/app.ini /conf/
-            if [ -e /db/git.db ]; then exit 0; fi
-            mkdir -p /data/git
-            cp -r /tmp/migration/gitea-repositories /data/git
-            touch /db/git.db
-            sqlite3 /db/git.db </tmp/migration/gitea-db.sql
-            chown git /db/git.db
-            chgrp git /db/git.db
-            chown -R git /data
-        command: ["/bin/sh", "-c", *script]
+            mkdir -p /datatmp/gitea/conf
+            if [ ! -f /datatmp/gitea/conf/app.ini ]; then
+              sed "s/POSTGRES_PASSWORD/${POSTGRES_PASSWORD}/g" < /etc/gitea/app.ini > /datatmp/gitea/conf/app.ini
+            fi
+        command: ["/bin/sh",'-c', *script]
+        volumeMounts:
+        - name: gitea-data
+          mountPath: /datatmp
+        - name: gitea-config
+          mountPath: /etc/gitea
       volumes:
       - name: gitea-data
         hostPath:
-          path: /mnt/data/cluster/gitea/data
-          type: Directory
-      - name: gitea-db
+          path: /mnt/data/cluster/gitea/gitea/data
+          type: DirectoryOrCreate
+      - name: postgres-data
         hostPath:
-          path: /mnt/data/cluster/gitea/db
-          type: Directory
+          path: /mnt/data/cluster/gitea/postgres
+          type: DirectoryOrCreate
       - name: gitea-config
         configMap:
-          name: gitea-app-ini
-      - name: gitea-configdir
-        emptyDir: {}
-      - hostPath:
-          path: /mnt/data/cluster/gitea-migration
-          type: Directory
-        name: gitea-migration
+          name: gitea

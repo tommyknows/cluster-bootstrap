@@ -5,13 +5,15 @@ metadata:
   namespace: gitea
   labels:
     app: gitea
-    webservice: "true"
+    chart: "gitea-1.9.3"
+    release: "gitea"
+    heritage: "Tiller"
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: http
-    port: 80
-    targetPort: gitea-http
+    port: 3000
+    targetPort: 3000
   selector:
     app: gitea
     webservice: "true"
@@ -23,13 +25,15 @@ metadata:
   namespace: gitea
   labels:
     app: gitea
-    webservice: "true"
+    chart: "gitea-1.9.3"
+    release: "gitea"
+    heritage: "Tiller"
 spec:
   type: LoadBalancer
+  loadBalancerIP: 192.168.1.2
   ports:
   - name: ssh
     port: 22
     targetPort: ssh
   selector:
     app: gitea
-    webservice: "true"
